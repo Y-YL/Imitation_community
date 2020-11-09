@@ -1,18 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
-	<link rel="stylesheet" href="../css/global.css" />
-	<link rel="stylesheet" href="../css/login.css" />
+	<link rel="stylesheet" th:href="@{/css/global.css}" />
+	<link rel="stylesheet" th:href="@{/css/login.css}" />
 	<title>牛客网-忘记密码</title>
 </head>
 <body>
 	<div class="nk-container">
 		<!-- 头部 -->
-		<header class="bg-dark sticky-top">
+		<header class="bg-dark sticky-top" th:replace="index::header">
 			<div class="container">
 				<!-- 导航 -->
 				<nav class="navbar navbar-expand-lg navbar-dark">
@@ -62,11 +62,11 @@
 		<!-- 内容 -->
 		<div class="main">
 			<div class="container pl-5 pr-5 pt-3 pb-3 mt-3 mb-3">
-				<form class="mt-5">				
+				<form class="mt-5" th:action="@{/user/resetpwd}"  method="post">
 					<div class="form-group row">
 						<label for="your-email" class="col-sm-2 col-form-label text-right">邮箱:</label>
 						<div class="col-sm-10">
-							<input type="email" class="form-control" id="your-email" placeholder="请输入您的邮箱!" required>
+							<input type="email" name="email" class="form-control" id="your-email" placeholder="请输入您的邮箱!" required>
 							<div class="invalid-feedback">
 								该邮箱已被注册!
 							</div>
@@ -75,19 +75,19 @@
 					<div class="form-group row mt-4">
 						<label for="verifycode" class="col-sm-2 col-form-label text-right">验证码:</label>
 						<div class="col-sm-6">
-							<input type="text" class="form-control" id="verifycode" placeholder="请输入验证码!">
+							<input type="text" name="code" class="form-control" id="verifycode" placeholder="请输入验证码!">
 							<div class="invalid-feedback">
 								验证码不正确!
 							</div>
 						</div>
 						<div class="col-sm-4">
-							<a href="javascript:;" class="btn btn-info form-control">获取验证码</a>
+							<a href="javascript:;" id="getKaptcha" class="btn btn-info form-control">获取验证码</a>
 						</div>
 					</div>	
 					<div class="form-group row mt-4">
 						<label for="your-password" class="col-sm-2 col-form-label text-right">新密码:</label>
 						<div class="col-sm-10">
-							<input type="password" class="form-control" id="your-password" placeholder="请输入新的密码!" required>
+							<input type="password" name="password" class="form-control" id="your-password" placeholder="请输入新的密码!" required>
 							<div class="invalid-feedback">
 								密码长度不能小于8位!
 							</div>							
@@ -96,7 +96,7 @@
 					<div class="form-group row mt-4">
 						<div class="col-sm-2"></div>
 						<div class="col-sm-10 text-center">
-							<button type="submit" class="btn btn-info text-white form-control">重置密码</button>
+							<button type="submit" id="resetPwdBtn" class="btn btn-info text-white form-control">重置密码</button>
 						</div>
 					</div>
 				</form>				
@@ -169,6 +169,28 @@
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
-	<script src="../js/global.js"></script>
+	<script th:src="@{/js/global.js}"></script>
+	<script>
+		$(function () {
+		    $("#getKaptcha").click(getKaptchaCode);
+        })
+		function getKaptchaCode() {
+            email = $("#your-email").val();
+            $.post(
+                CONTEXT_PATH+"/user/sendresetpwdkaptcha",
+                {
+                    "email":email
+                },
+                function (data) {
+                    data = $.parseJSON(data);
+                    if (data.code == 0){
+                        alert("验证码已发送，有效时间5分钟");
+                    }else{
+                        alert("发送失败，请重试!");
+                    }
+                }
+            )
+        }
+	</script>
 </body>
 </html>
