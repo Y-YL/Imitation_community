@@ -27,10 +27,11 @@
         where email = #{email}
     </select>
 
-    <select id="insertUser" parameterType="User">
+    <insert id="insertUser" parameterType="User" keyColumn="id"
+            useGeneratedKeys="true" keyProperty="id">
         insert into user (<include refid="insertFields"></include>)
         values (#{username},#{password},#{salt},#{email},#{type},#{status},#{activationCode},#{headerUrl},#{createTime})
-    </select>
+    </insert>
 
     <update id="updateStatus">
         UPDATE  user set status = #{status} where id = #{id}
@@ -41,7 +42,32 @@
     </update>
 
     <update id="updatePassword">
-        update user set password = #{password} where id = #{id}
+        update user set password = #{password}, salt=#{salt} where id = #{id}
     </update>
+
+    <select id="selectDiscussPostsByUserId" resultType="DiscussPost">
+        select *
+        from discuss_post
+        where user_id = #{userId} order by create_time desc
+        limit #{offset},#{limit}
+    </select>
+
+    <select id="selectCommentsByUserId" resultType="Comment">
+        select *
+        from comment
+        where user_id = #{userId} order by create_time desc
+        limit #{offset},#{limit}
+    </select>
+    <select id="selectCommentsRowsByUserId" resultType="int">
+        select count(id)
+        from comment
+        where user_id = #{userId}
+    </select>
+    <select id="selectDiscussPostsRowsByUserId" resultType="int">
+        select count(id)
+        from discuss_post
+        where user_id = #{userId}
+    </select>
+
 
 </mapper>
