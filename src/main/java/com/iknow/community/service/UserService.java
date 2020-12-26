@@ -10,6 +10,7 @@ import com.iknow.community.util.CommunityUtil;
 import com.iknow.community.util.MailClient;
 import com.iknow.community.util.RedisKeyUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,6 +22,7 @@ import org.thymeleaf.context.Context;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+@DubboService
 @Service
 public class UserService implements CommunityConstant{
 
@@ -99,7 +101,7 @@ public class UserService implements CommunityConstant{
         user.setActivationCode(CommunityUtil.generateUUID());//激活码
         user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
         user.setCreateTime(new Date());
-        System.out.println(user);
+        //System.out.println(user);
         userMapper.insertUser(user);
 
         // 发送激活邮件
@@ -219,7 +221,6 @@ public class UserService implements CommunityConstant{
      */
     public int updateHeaderUrl(int userId, String headerUrl)
     {
-
         int rows = userMapper.updateHeader(userId,headerUrl);
         // 更新头像，数据发生改变
         clearUserCache(userId);
