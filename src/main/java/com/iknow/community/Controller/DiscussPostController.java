@@ -5,7 +5,7 @@ import com.iknow.community.event.EventProducer;
 import com.iknow.community.service.CommentService;
 import com.iknow.community.service.DiscussPostService;
 import com.iknow.community.service.LikeService;
-import com.iknow.community.service.UserService;
+import com.iknow.community.service.UserServiceImpl;
 import com.iknow.community.util.CommunityConstant;
 import com.iknow.community.util.CommunityUtil;
 import com.iknow.community.util.HostHolder;
@@ -32,7 +32,7 @@ public class DiscussPostController implements CommunityConstant{
     private HostHolder hostHolder;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private LikeService likeService;
@@ -84,7 +84,7 @@ public class DiscussPostController implements CommunityConstant{
         // 获取帖子
         DiscussPost post = discussPostService.findDiscussPostById(discussPostId);
         // 获取发帖人信息
-        User user = userService.findUserById(post.getUserId());
+        User user = userServiceImpl.findUserById(post.getUserId());
         model.addAttribute("post",post);
         model.addAttribute("user",user);
         // 获取该贴子的点赞数量
@@ -109,7 +109,7 @@ public class DiscussPostController implements CommunityConstant{
                 // 评论
                 commentVo.put("comment",comment);
                 // 该条评论的作者
-                commentVo.put("user",userService.findUserById(comment.getUserId()));
+                commentVo.put("user", userServiceImpl.findUserById(comment.getUserId()));
 
                 // 获取该评论的点赞数量
                  likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_COMMENT, comment.getId());
@@ -130,9 +130,9 @@ public class DiscussPostController implements CommunityConstant{
                         // 回复
                         replyVo.put("reply",reply);
                         // 回复作者
-                        replyVo.put("user",userService.findUserById(reply.getUserId()));
+                        replyVo.put("user", userServiceImpl.findUserById(reply.getUserId()));
                         // 回复的目标
-                        User target = reply.getTargetId()==0? null:userService.findUserById(reply.getTargetId());
+                        User target = reply.getTargetId()==0? null: userServiceImpl.findUserById(reply.getTargetId());
                         replyVo.put("target",target);
 
                         // 获取该回复的点赞数量

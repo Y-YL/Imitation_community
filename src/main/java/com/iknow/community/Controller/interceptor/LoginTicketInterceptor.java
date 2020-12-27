@@ -2,7 +2,7 @@ package com.iknow.community.Controller.interceptor;
 
 import com.iknow.community.bean.LoginTicket;
 import com.iknow.community.bean.User;
-import com.iknow.community.service.UserService;
+import com.iknow.community.service.UserServiceImpl;
 import com.iknow.community.util.CookieUtil;
 import com.iknow.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.Date;
 public class LoginTicketInterceptor implements HandlerInterceptor {
 
     @Autowired
-    UserService userService;
+    UserServiceImpl userServiceImpl;
 
     @Autowired
     HostHolder hostHolder;
@@ -42,15 +42,15 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
         String ticket = CookieUtil.getValue(request,"ticket");
 
         if (ticket!=null){
-            LoginTicket loginTicket = userService.findLoginTicket(ticket);
+            LoginTicket loginTicket = userServiceImpl.findLoginTicket(ticket);
             // 检查凭证是否有效
             if (loginTicket != null && loginTicket.getStatus()==0 && loginTicket.getExpired().after(new Date())){
                 // 根据凭证查询用户
-                User user = userService.findUserById(loginTicket.getUserId());
+                User user = userServiceImpl.findUserById(loginTicket.getUserId());
                 // 在本次请求中持有用户
                 hostHolder.setUser(user);
                 // 构建用户认证的结果，并存入SecurityContext,以便于Security进行授权.
-                Authentication authentication = new UsernamePasswordAuthenticationToken(user,user.getPassword(),userService.getAuthorities(user.getId()));
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user,user.getPassword(), userServiceImpl.getAuthorities(user.getId()));
                 SecurityContextHolder.setContext((new SecurityContextImpl(authentication)));
             }
         }

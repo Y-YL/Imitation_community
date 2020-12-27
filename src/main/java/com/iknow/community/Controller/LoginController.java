@@ -2,7 +2,7 @@ package com.iknow.community.Controller;
 
 import com.google.code.kaptcha.Producer;
 import com.iknow.community.bean.User;
-import com.iknow.community.service.UserService;
+import com.iknow.community.service.UserServiceImpl;
 import com.iknow.community.util.CommunityConstant;
 import com.iknow.community.util.CommunityUtil;
 import com.iknow.community.util.RedisKeyUtil;
@@ -36,7 +36,7 @@ public class LoginController implements CommunityConstant {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private Producer kaptchaProducer;
@@ -66,7 +66,7 @@ public class LoginController implements CommunityConstant {
      */
     @RequestMapping(path = "/register", method = RequestMethod.POST)
     public String register(Model model, User user) {
-        Map<String, Object> map = userService.register(user);
+        Map<String, Object> map = userServiceImpl.register(user);
         if (map == null || map.isEmpty()) {
             model.addAttribute("msg", "注册成功，我们已经发送激活邮件，请尽快激活");
             model.addAttribute("target", "/index");
@@ -91,7 +91,7 @@ public class LoginController implements CommunityConstant {
      */
     @RequestMapping("/activation/{userId}/{code}")
     public String activation(Model model, @PathVariable("userId") int userId, @PathVariable("code") String code) {
-        int activation = userService.activation(userId, code);
+        int activation = userServiceImpl.activation(userId, code);
         if (activation == CommunityConstant.ACTIVATION_SUCCESS) {
             model.addAttribute("msg", "账号激活成功，请登录");
             model.addAttribute("target", "/login");
@@ -179,7 +179,7 @@ public class LoginController implements CommunityConstant {
         }
         // 检查账号密码
         int expired = rememberme ? REMEMBER_EXPIRED_SECONDS : DEFAULT_EXPIRED_SECONDS;
-        Map<String, Object> map = userService.login(username, password, expired);
+        Map<String, Object> map = userServiceImpl.login(username, password, expired);
         if (map.containsKey("ticket")) {
             Cookie cookie = new Cookie("ticket", map.get("ticket").toString());
             cookie.setPath(contextPath);
@@ -195,7 +195,7 @@ public class LoginController implements CommunityConstant {
 
     @RequestMapping(value = "/logout")
     public String logout(@CookieValue("ticket") String ticket) {
-        userService.logout(ticket);
+        userServiceImpl.logout(ticket);
         SecurityContextHolder.clearContext();
         return "redirect:/login";
     }

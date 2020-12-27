@@ -5,7 +5,7 @@ import com.iknow.community.bean.Message;
 import com.iknow.community.bean.Page;
 import com.iknow.community.bean.User;
 import com.iknow.community.service.MessageService;
-import com.iknow.community.service.UserService;
+import com.iknow.community.service.UserServiceImpl;
 import com.iknow.community.util.CommunityConstant;
 import com.iknow.community.util.CommunityUtil;
 import com.iknow.community.util.HostHolder;
@@ -30,7 +30,7 @@ public class MessageController implements CommunityConstant{
     private HostHolder hostHolder;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
     // 处理私信列表
     @RequestMapping(path = "/letter/list",method = RequestMethod.GET)
     public String getLetterList(Model model, Page page){
@@ -54,7 +54,7 @@ public class MessageController implements CommunityConstant{
                // 与当前用户私信间未读消息数量
                map.put("unreadCount",messageService.findLetterUnreadCount(user.getId(),message.getConversationId()));
                int targetId = user.getId() == message.getFromId()? message.getToId():message.getFromId();
-               map.put("target",userService.findUserById(targetId));
+               map.put("target", userServiceImpl.findUserById(targetId));
 
                conversations.add(map);
            }
@@ -84,7 +84,7 @@ public class MessageController implements CommunityConstant{
             for (Message message:letterList){
                 Map<String,Object> map = new HashMap<>();
                 map.put("letter",message);
-                map.put("fromUser",userService.findUserById(message.getFromId()));
+                map.put("fromUser", userServiceImpl.findUserById(message.getFromId()));
                 letters.add(map);
             }
         }
@@ -128,9 +128,9 @@ public class MessageController implements CommunityConstant{
         int id1 = Integer.parseInt(ids[1]);
 
         if (hostHolder.getUser().getId() == id0){
-            return userService.findUserById(id1);
+            return userServiceImpl.findUserById(id1);
         }else {
-            return userService.findUserById(id0);
+            return userServiceImpl.findUserById(id0);
         }
     }
 
@@ -138,7 +138,7 @@ public class MessageController implements CommunityConstant{
     @RequestMapping(path = "/letter/send",method = RequestMethod.POST)
     @ResponseBody
     public String sendLetter(String toName,String content){
-        User target = userService.findUserByName(toName);
+        User target = userServiceImpl.findUserByName(toName);
         if (target == null){
             return CommunityUtil.getJSONString(1,"目标用户不存在!");
         }
@@ -173,7 +173,7 @@ public class MessageController implements CommunityConstant{
             messageVo.put("message",message);
             String content = HtmlUtils.htmlUnescape(message.getContent());
             Map<String,Object> data = JSONObject.parseObject(content,HashMap.class);
-            messageVo.put("user",userService.findUserById((Integer) data.get("userId")));
+            messageVo.put("user", userServiceImpl.findUserById((Integer) data.get("userId")));
             messageVo.put("entityType",data.get("entityType"));
             messageVo.put("entityId",data.get("entityId"));
             messageVo.put("postId",data.get("postId"));
@@ -192,7 +192,7 @@ public class MessageController implements CommunityConstant{
             messageVo.put("message",message);
             String content = HtmlUtils.htmlUnescape(message.getContent());
             Map<String,Object> data = JSONObject.parseObject(content,HashMap.class);
-            messageVo.put("user",userService.findUserById((Integer) data.get("userId")));
+            messageVo.put("user", userServiceImpl.findUserById((Integer) data.get("userId")));
             messageVo.put("entityType",data.get("entityType"));
             messageVo.put("entityId",data.get("entityId"));
             messageVo.put("postId",data.get("postId"));
@@ -210,7 +210,7 @@ public class MessageController implements CommunityConstant{
             messageVo.put("message",message);
             String content = HtmlUtils.htmlUnescape(message.getContent());
             Map<String,Object> data = JSONObject.parseObject(content,HashMap.class);
-            messageVo.put("user",userService.findUserById((Integer) data.get("userId")));
+            messageVo.put("user", userServiceImpl.findUserById((Integer) data.get("userId")));
             messageVo.put("entityType",data.get("entityType"));
             messageVo.put("entityId",data.get("entityId"));
 
@@ -244,12 +244,12 @@ public class MessageController implements CommunityConstant{
                 map.put("notice",notice);
                 String content = HtmlUtils.htmlUnescape(notice.getContent());
                 Map<String,Object> data = JSONObject.parseObject(content,HashMap.class);
-                map.put("user",userService.findUserById((Integer) data.get("userId")));
+                map.put("user", userServiceImpl.findUserById((Integer) data.get("userId")));
                 map.put("entityType",data.get("entityType"));
                 map.put("entityId",data.get("entityId"));
                 map.put("postId",data.get("postId"));
                 // 通知的产生者
-                map.put("fromUser",userService.findUserById(notice.getFromId()));
+                map.put("fromUser", userServiceImpl.findUserById(notice.getFromId()));
                 noticeVoList.add(map);
             }
         }

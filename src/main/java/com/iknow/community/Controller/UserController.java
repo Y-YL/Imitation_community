@@ -1,6 +1,5 @@
 package com.iknow.community.Controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Producer;
 import com.iknow.community.annotation.LoginRequired;
 import com.iknow.community.bean.Comment;
@@ -15,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -54,7 +52,7 @@ public class UserController implements CommunityConstant{
     private HostHolder hostHolder;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private LikeService likeService;
@@ -121,7 +119,7 @@ public class UserController implements CommunityConstant{
         // http://localhost:8080/community/user/header/xxx.png
         User user  = hostHolder.getUser();
         String headerUrl = domain + contextPath + "/user/header/" + fileName;
-        userService.updateHeaderUrl(user.getId(),headerUrl);
+        userServiceImpl.updateHeaderUrl(user.getId(),headerUrl);
         // 更新后重定向到首页，刷新页面
         return "redirect:/index";
     }
@@ -156,9 +154,9 @@ public class UserController implements CommunityConstant{
             return "/site/setting";
         }
         // 更新数据库内容
-        userService.updatePassword(user.getId(),newPassword);
+        userServiceImpl.updatePassword(user.getId(),newPassword);
         // 密码修改成功，退出登录
-        userService.logout(ticket);
+        userServiceImpl.logout(ticket);
         model.addAttribute("target","/index");
         model.addAttribute("msg","您的密码修改成功!");
         // 跳转信息提示页面
@@ -168,7 +166,7 @@ public class UserController implements CommunityConstant{
     @RequestMapping(path = "/profile/{userId}",method = RequestMethod.GET)
     public String getProfilePage(@PathVariable("userId")int userId,Model model){
 
-        User user = userService.findUserById(userId);
+        User user = userServiceImpl.findUserById(userId);
         if (user == null){
             throw new RuntimeException("该用户不存在");
         }
@@ -194,7 +192,7 @@ public class UserController implements CommunityConstant{
 
     @RequestMapping(path = "/followees/{userId}", method = RequestMethod.GET)
     public String getFollowees(@PathVariable("userId") int userId, Page page,Model model){
-        User user = userService.findUserById(userId);
+        User user = userServiceImpl.findUserById(userId);
 
         if (user == null){
             throw new RuntimeException("该用户不存在!");
@@ -220,7 +218,7 @@ public class UserController implements CommunityConstant{
 
     @RequestMapping(path = "/followers/{userId}", method = RequestMethod.GET)
     public String getFollowers(@PathVariable("userId") int userId, Page page,Model model){
-        User user = userService.findUserById(userId);
+        User user = userServiceImpl.findUserById(userId);
         if (user == null){
             throw new RuntimeException("该用户不存在!");
         }
@@ -252,7 +250,7 @@ public class UserController implements CommunityConstant{
 
     @RequestMapping(path = "/mypost/{userId}",method = RequestMethod.GET)
     public String getMyPosts(@PathVariable("userId") int userId,Model model,Page page){
-        page.setRows(userService.findDiscussPostsRowsByUserId(userId));
+        page.setRows(userServiceImpl.findDiscussPostsRowsByUserId(userId));
         page.setPath("/myposts/"+userId);
         User user = hostHolder.getUser();
         List<DiscussPost> posts = discussPostService.findDiscussPosts(userId,page.getOffset(),page.getLimit(),0);//userService.findDiscussPostsByUserId(userId,page.getOffset(),page.getLimit());
@@ -296,11 +294,11 @@ public class UserController implements CommunityConstant{
             model.addAttribute("resetPwdMsg","邮箱不能为空!!!");
             return "/site/forget";
         }
-        User user = userService.findUserByEmail(email);
+        User user = userServiceImpl.findUserByEmail(email);
         String redisKey = RedisKeyUtil.getResetpasswordKaptcha(email);
         String  kaptchaCode = (String)redisTemplate.opsForValue().get(redisKey);
         if (code.equals(kaptchaCode)){
-            userService.updatePassword(user.getId(),password);
+            userServiceImpl.updatePassword(user.getId(),password);
             model.addAttribute("msg","密码修改成功!");
             model.addAttribute("target","/index");
         }else{

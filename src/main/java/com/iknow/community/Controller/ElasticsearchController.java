@@ -4,7 +4,7 @@ import com.iknow.community.bean.DiscussPost;
 import com.iknow.community.bean.Page;
 import com.iknow.community.service.ElasticsearchService;
 import com.iknow.community.service.LikeService;
-import com.iknow.community.service.UserService;
+import com.iknow.community.service.UserServiceImpl;
 import com.iknow.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ public class ElasticsearchController implements CommunityConstant{
     private ElasticsearchService elasticsearchService;
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private LikeService likeService;
@@ -41,7 +41,7 @@ public class ElasticsearchController implements CommunityConstant{
                 // 帖子
                 map.put("post",post);
                 // 作者
-                map.put("user",userService.findUserById(post.getUserId()));
+                map.put("user", userServiceImpl.findUserById(post.getUserId()));
                 // 点赞数量
                 map.put("likeCount",likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId()));
                 discussPosts.add(map);

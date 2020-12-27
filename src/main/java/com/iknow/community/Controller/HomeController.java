@@ -5,7 +5,7 @@ import com.iknow.community.bean.Page;
 import com.iknow.community.bean.User;
 import com.iknow.community.service.DiscussPostService;
 import com.iknow.community.service.LikeService;
-import com.iknow.community.service.UserService;
+import com.iknow.community.service.UserServiceImpl;
 import com.iknow.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class HomeController implements CommunityConstant{
 
     @Autowired
-    private UserService userService;
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private DiscussPostService discussPostService;
@@ -63,7 +63,7 @@ public class HomeController implements CommunityConstant{
             for (DiscussPost post :posts){
                 Map<String ,Object> map = new HashMap<>();
                 map.put("post",post);
-                User user = userService.findUserById(post.getUserId());
+                User user = userServiceImpl.findUserById(post.getUserId());
                 map.put("user",user);
                 long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, post.getId());
                 map.put("likeCount",likeCount);
