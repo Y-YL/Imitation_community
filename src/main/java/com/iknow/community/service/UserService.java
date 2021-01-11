@@ -23,7 +23,7 @@ public interface UserService {
      * @param user
      * @return
      */
-    public Map<String, Object> register(User user);
+    public Map<String, Object> register(User user,String contextPath);
     /**
      * 激活账号
      *

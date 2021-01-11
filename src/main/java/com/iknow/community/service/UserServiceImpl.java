@@ -22,6 +22,9 @@ import org.thymeleaf.context.Context;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ *  该服务对外暴露，提供登录、注册、等功能
+ */
 @DubboService
 @Service
 public class UserServiceImpl implements CommunityConstant,UserService {
@@ -43,8 +46,8 @@ public class UserServiceImpl implements CommunityConstant,UserService {
     @Value("${community.path.domain}")
     private String domain;
 
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
+//    @Value("${server.servlet.context-path}")
+//    private String contextPath;
 
     /**
      * 通过id查询用户
@@ -65,7 +68,7 @@ public class UserServiceImpl implements CommunityConstant,UserService {
      * @param user
      * @return
      */
-    public Map<String, Object> register(User user) {
+    public Map<String, Object> register(User user,String contextPath) {
         Map<String, Object> map = new HashMap<>();
         if (user == null) {
             throw new IllegalArgumentException("参数不能为空");
